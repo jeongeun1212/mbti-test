@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>유통/서비스IT팀 리더 MBTI 대시보드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF1EE;
+    --bg-alt:#E2E8E4;
+    --surface:#FFFFFF;
+    --ink:#182420;
+    --muted:#5B6B65;
+    --line:rgba(24,36,32,0.16);
+    --line-strong:rgba(24,36,32,0.32);
+    --accent:#F5B700;
+    --accent-ink:#3D2E00;
+    --route:#1F5673;
+    --danger:#B4432F;
+    --nt:#6C5CE7;
+    --nf:#2FA36B;
+    --sj:#2E6F9E;
+    --sp:#E2932E;
+    --radius:3px;
+    --font-display:'Pretendard Variable','Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-display);
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+  h1,h2,h3,p{ margin:0; }
+
+  .barcode{
+    height:9px; width:100%;
+    background:repeating-linear-gradient(90deg,
+      var(--ink) 0 2px, transparent 2px 5px,
+      var(--ink) 5px 6px, transparent 6px 12px,
+      var(--ink) 12px 15px, transparent 15px 22px,
+      var(--ink) 22px 23px, transparent 23px 30px);
+    opacity:0.9;
+  }
+  .barcode-mini{
+    height:16px; width:96px; display:inline-block;
+    background:repeating-linear-gradient(90deg,
+      var(--ink) 0 2px, transparent 2px 4px,
+      var(--ink) 4px 5px, transparent 5px 9px,
+      var(--ink) 9px 11px, transparent 11px 15px);
+    opacity:0.75;
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+  }
+  .wordmark{
+    font-family:var(--font-mono); font-weight:600; font-size:13px;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--route);
+    text-decoration:none; background:none; border:none; padding:0;
+  }
+  .tabs{ display:flex; gap:6px; }
+  .tab{
+    font-family:var(--font-mono); font-size:13px; padding:8px 12px;
+    color:var(--muted); text-decoration:none;
+    border-bottom:2px solid transparent;
+  }
+  .tab.active{ color:var(--ink); border-bottom-color:var(--accent); font-weight:600; }
+  .tab:focus-visible, button:focus-visible, input:focus-visible, a:focus-visible{
+    outline:2px solid var(--route); outline-offset:2px;
+  }
+
+  .container{ max-width:920px; margin:0 auto; padding:32px 20px 80px; }
+
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
+  .container > *{ animation:riseIn .35s ease both; }
+  @media (prefers-reduced-motion:reduce){ .container > *{ animation:none !important; } }
+  .test-step{ animation:none !important; }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em;
+    color:var(--muted); text-transform:uppercase;
+  }
+  .mono-label{ font-family:var(--font-mono); font-size:12px; color:var(--muted); letter-spacing:0.02em; }
+
+  /* ---------- home ---------- */
+  .grid2{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:28px; margin-bottom:20px; }
+  .hero-copy h1{ font-size:27px; font-weight:700; margin:10px 0 14px; letter-spacing:-0.01em; }
+  .hero-copy p{ color:var(--muted); margin-bottom:10px; max-width:46ch; }
+  .hero-copy .note{ font-size:13px; }
+
+  .ticket{
+    position:relative;
+    background:var(--surface);
+    border:1px dashed var(--line-strong);
+    border-radius:var(--radius);
+    padding:22px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .ticket::before, .ticket::after{
+    content:""; position:absolute; width:16px; height:16px; background:var(--bg);
+    border-radius:50%; top:50%; transform:translateY(-50%);
+  }
+  .ticket::before{ left:-9px; }
+  .ticket::after{ right:-9px; }
+  #nickname-input, #admin-password{
+    font-family:var(--font-display); font-size:15px;
+    padding:12px 14px; border:1px solid var(--line-strong); border-radius:var(--radius);
+    background:var(--bg); color:var(--ink); width:100%;
+  }
+  .btn-primary{
+    font-family:var(--font-mono); font-weight:600; font-size:13px; letter-spacing:0.02em;
+    background:var(--accent); color:var(--accent-ink); border:none;
+    padding:13px 16px; border-radius:var(--radius);
+  }
+  .btn-primary:hover{ filter:brightness(0.96); }
+  .btn-primary:disabled{ opacity:0.35; cursor:not-allowed; }
+  .btn-primary.small{ padding:9px 14px; font-size:12px; }
+  .btn-outline{
+    font-family:var(--font-mono); font-size:13px; font-weight:600;
+    background:transparent; color:var(--route); border:1px solid var(--route);
+    padding:11px 16px; border-radius:var(--radius);
+  }
+  .btn-outline:disabled{ opacity:0.35; cursor:not-allowed; }
+  .btn-outline.small{ padding:7px 12px; font-size:12px; }
+  .btn-danger{
+    font-family:var(--font-mono); font-size:12px; font-weight:600;
+    background:transparent; color:var(--danger); border:1px solid var(--danger);
+    padding:6px 10px; border-radius:var(--radius);
+  }
+  .btn-danger:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; margin-bottom:20px;
+  }
+  .card h2{ font-size:16px; font-weight:700; margin-bottom:8px; }
+  .followup p{ color:var(--muted); font-size:14px; margin-bottom:14px; }
+
+  /* ---------- test wizard ---------- */
+  .test-head{ margin-bottom:16px; }
+  .test-head h1{ font-size:21px; font-weight:700; }
+
+  .overall-bar{ height:6px; background:var(--bg-alt); border-radius:4px; overflow:hidden; margin-bottom:14px; }
+  .overall-fill{ height:100%; background:var(--route); transition:width .3s ease; }
+  @media (prefers-reduced-motion:reduce){ .overall-fill{ transition:none; } }
+
+  .segments{ display:flex; gap:6px; margin-bottom:10px; }
+  .segment{ flex:1; height:4px; background:var(--bg-alt); border-radius:3px; overflow:hidden; }
+  .segment-fill{ height:100%; background:var(--muted); }
+  .segment.current .segment-fill{ background:var(--accent); }
+
+  .progress-meta{ display:flex; justify-content:space-between; margin-bottom:22px; }
+
+  .wizard-question{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:32px 28px; margin-bottom:20px; min-height:180px;
+  }
+  .q-text-big{ font-size:19px; font-weight:600; line-height:1.5; margin-bottom:22px; }
+  .likert-vertical{ display:flex; flex-direction:column; gap:8px; }
+  .likert-vbtn{
+    font-size:14.5px; padding:13px 16px; border:1px solid var(--line-strong);
+    background:var(--bg); color:var(--ink); border-radius:var(--radius); text-align:left;
+  }
+  .likert-vbtn.selected{ background:var(--route); border-color:var(--route); color:#fff; font-weight:600; }
+
+  .wizard-nav{ display:flex; justify-content:space-between; gap:10px; }
+
+  /* ---------- gauges ---------- */
+  .gauges{ display:flex; flex-direction:column; gap:16px; }
+  .gauge-label{ font-size:13px; font-weight:600; margin-bottom:6px; }
+  .gauge-bar{ height:10px; border-radius:6px; background:var(--bg-alt); overflow:hidden; }
+  .gauge-fill{ height:100%; background:var(--route); }
+  .gauge-ends{
+    display:flex; justify-content:space-between; margin-top:4px;
+    font-family:var(--font-mono); font-size:12px; color:var(--muted);
+  }
+
+  /* ---------- result / detail ---------- */
+  .result-ticket{ padding:26px; }
+  .ticket-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .style-question{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .style-hero-link{ text-decoration:none; display:inline-block; }
+  .style-hero{
+    font-size:34px; font-weight:800; letter-spacing:-0.01em; margin-bottom:12px;
+    color:var(--group-color, var(--route));
+  }
+  .style-hero-link:hover .style-hero{ text-decoration:underline; }
+  .result-chips{ display:flex; align-items:center; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .code-chip{
+    font-family:var(--font-mono); font-size:13px; font-weight:700; color:var(--ink);
+    border:1px solid var(--line-strong); padding:4px 10px; border-radius:20px;
+    text-decoration:none;
+  }
+  a.code-chip:hover{ border-color:var(--route); color:var(--route); }
+  .group-chip{
+    font-family:var(--font-mono); font-size:11px; font-weight:700; color:#fff;
+    background:var(--group-color, var(--route)); padding:4px 10px; border-radius:20px;
+  }
+  .nickname-line{ font-size:14px; color:var(--muted); margin-bottom:4px; }
+  .desc{ font-size:14.5px; color:var(--muted); max-width:56ch; margin-bottom:22px; }
+  .ticket-foot{ border-top:1px dashed var(--line-strong); padding-top:14px; }
+  .actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+  /* ---------- MBTI type detail page ---------- */
+  .style-detail{ padding:28px; }
+  .type-emoji{ font-size:34px; line-height:1; }
+  .style-code-big{
+    font-family:var(--font-mono); font-size:40px; font-weight:700; letter-spacing:0.01em;
+    color:var(--group-color, var(--route)); margin:14px 0 6px;
+  }
+  .style-tagline{ font-size:15px; color:var(--muted); margin-bottom:14px; }
+  .style-alias-heading{ font-size:22px; font-weight:800; margin:16px 0 8px; }
+  .style-sections{ border-top:1px dashed var(--line-strong); padding-top:16px; margin-top:6px; }
+  .style-sections h3{ font-size:14px; font-weight:700; margin-bottom:14px; }
+  .style-block{ margin-bottom:14px; }
+  .style-block-label{
+    display:inline-block; font-family:var(--font-mono); font-size:11px; font-weight:700;
+    color:var(--group-color, var(--route)); text-transform:uppercase; letter-spacing:0.04em;
+    margin-bottom:4px;
+  }
+  .style-block p{ font-size:14px; color:var(--ink); }
+
+  /* ---------- dashboard ---------- */
+  .dash-head{ margin-bottom:20px; }
+  .dash-head h1{ font-size:22px; font-weight:700; margin-bottom:10px; }
+  .dash-stat{ display:flex; align-items:center; justify-content:space-between; }
+  .type-bars{ display:flex; flex-direction:column; gap:8px; }
+  .type-bar-row{ display:grid; grid-template-columns:56px 1fr 24px; align-items:center; gap:10px; }
+  .type-code{ font-family:var(--font-mono); font-size:12.5px; font-weight:700; }
+  .type-bar-track{ height:8px; background:var(--bg-alt); border-radius:5px; overflow:hidden; }
+  .type-bar-fill{ height:100%; border-radius:5px; min-width:2px; }
+  .type-count{ font-family:var(--font-mono); font-size:12px; color:var(--muted); text-align:right; }
+  .hint{ font-size:13px; color:var(--muted); margin-bottom:12px; }
+
+  .member-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .member-table th{
+    text-align:left; font-family:var(--font-mono); font-size:11.5px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:0.04em; padding:8px 10px; border-bottom:1px solid var(--line-strong);
+  }
+  .member-table td{ padding:10px; border-bottom:1px solid var(--line); }
+  .member-table .empty{ color:var(--muted); text-align:center; padding:22px 0; }
+  .row-link{ text-decoration:underline; text-decoration-color:var(--line-strong); font-weight:600; }
+  .mono-cell{ font-family:var(--font-mono); font-size:12.5px; color:var(--muted); }
+  .badge{
+    font-family:var(--font-mono); font-size:11.5px; font-weight:700; color:#fff;
+    background:var(--badge-color, var(--route)); padding:3px 9px; border-radius:3px;
+    text-decoration:none; display:inline-block;
+  }
+  a.badge:hover{ filter:brightness(1.1); }
+  .admin-toolbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .note.warn{ color:var(--danger); font-size:13px; margin-top:8px; }
+  .loading{ color:var(--muted); font-family:var(--font-mono); font-size:13px; padding:40px 0; text-align:center; }
+
+  .admin-gate{ max-width:360px; margin:40px auto 0; text-align:left; }
+  .admin-gate h1{ font-size:19px; font-weight:700; margin-bottom:8px; }
+  .admin-gate .note{ color:var(--muted); font-size:13.5px; margin-bottom:14px; }
+  .admin-gate .btn-primary{ width:100%; margin-top:10px; }
+
+  #fallback-banner{
+    background:#FFF3CD; color:#5C4400; font-size:13px; text-align:center;
+    padding:9px 16px; border-bottom:1px solid rgba(92,68,0,0.2);
+  }
+
+  #toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(10px);
+    background:var(--ink); color:#fff; font-size:13px; padding:11px 18px; border-radius:var(--radius);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+    font-family:var(--font-display); z-index:50;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:680px){
+    .grid2{ grid-template-columns:1fr; }
+    .container{ padding:20px 14px 70px; }
+    .topbar{ padding:14px 16px; }
+    .type-bar-row{ grid-template-columns:48px 1fr 22px; }
+    .wizard-question{ padding:24px 18px; }
+    .style-hero{ font-size:27px; }
+  }
+</style>
+</head>
+<body>
+  <div class="barcode"></div>
+  <header class="topbar">
+    <a href="#/home" class="wordmark" id="wordmark">유통/서비스IT팀 · 리더 MBTI</a>
+    <nav class="tabs">
+      <a href="#/test" class="tab" data-path="test">테스트</a>
+      <a href="#/dashboard" class="tab" data-path="dashboard">대시보드</a>
+      <a href="#/admin" class="tab" data-path="admin">관리자</a>
+    </nav>
+  </header>
+  <div id="fallback-banner" style="display:none;"></div>
+  <main id="app" class="container"></main>
+  <div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ config ============ */
+  var ADMIN_PASSWORD = "1q2w3e"; // NOTE: client-side gate only, not real security — visible in page/repo source.
+
+  /* ============ storage backend ============
+     Three possible backends, chosen automatically at startup:
+     1. "claude"  — Claude's built-in artifact storage (window.storage).
+                    Used when this page is opened inside a Claude.ai artifact.
+     2. "http"    — this app's own /api/members endpoint, backed by a real
+                    Neon Postgres database. Used when deployed on Vercel
+                    (or any host that serves that API alongside this file).
+     3. "memory"  — in-memory only, used as a last-resort fallback (e.g. the
+                    file opened directly, or hosted somewhere with no API).
+                    Results only last for the current tab and are not shared.
+     detectBackend() runs once at startup; see the bottom of this file. */
+  var backendMode = 'memory';
+  var memoryStore = {}; // used only in 'memory' mode
+
+  function apiUrl(path){
+    return window.location.origin + path;
+  }
+
+  async function detectBackend(){
+    if(typeof window.storage !== 'undefined') return 'claude';
+    try{
+      var res = await fetch(apiUrl('/api/members'), { method:'GET' });
+      if(res.ok) return 'http';
+    }catch(e){ /* no API available at this origin */ }
+    return 'memory';
+  }
+
+  /* ============ data ============ */
+  var LIKERT_LABELS = ['전혀 아님','아님','보통','그럼','매우 그럼'];
+
+  var CATEGORIES = [
+    { key:'EI', label:'에너지 방향', left:'E', right:'I' },
+    { key:'SN', label:'정보 인식',   left:'S', right:'N' },
+    { key:'TF', label:'판단 기준',   left:'T', right:'F' },
+    { key:'JP', label:'생활 방식',   left:'J', right:'P' }
+  ];
+
+  var QUESTIONS = [
+    { id:1,  cat:'EI', pole:'E', text:'새로운 팀원이나 이해관계자를 만나면 내가 먼저 나서서 관계를 트는 편이다.' },
+    { id:2,  cat:'EI', pole:'I', text:'여러 이해관계자와 미팅을 마친 뒤에는 혼자 정리할 시간이 꼭 필요하다.' },
+    { id:3,  cat:'EI', pole:'E', text:'팀 회의에서는 방향을 먼저 제시하고 논의를 이끄는 편이다.' },
+    { id:4,  cat:'EI', pole:'I', text:'중요한 결정을 내리기 전, 말보다 글로 먼저 생각을 정리하는 편이다.' },
+    { id:5,  cat:'EI', pole:'E', text:'새로운 조직이나 프로젝트를 맡으면 구성원들과 빠르게 라포를 쌓는 것부터 시작한다.' },
+    { id:6,  cat:'EI', pole:'I', text:'여러 팀·부서와 동시에 조율할 일이 많으면 에너지가 빠르게 소진된다.' },
+    { id:7,  cat:'EI', pole:'E', text:'타 부서와의 협업 자리에서는 내가 먼저 화제를 꺼내고 분위기를 이끈다.' },
+    { id:8,  cat:'EI', pole:'I', text:'방해받지 않고 혼자 전략을 구상할 시간이 있어야 판단이 선명해진다.' },
+
+    { id:9,  cat:'SN', pole:'S', text:'실행 계획은 구체적인 절차와 수치가 뒷받침될 때 신뢰가 간다.' },
+    { id:10, cat:'SN', pole:'N', text:'지금의 방식보다 앞으로 조직이 나아갈 방향과 가능성을 먼저 그려본다.' },
+    { id:11, cat:'SN', pole:'S', text:'데이터나 실적 없이 진행되는 전략 논의는 불안하게 느껴진다.' },
+    { id:12, cat:'SN', pole:'N', text:'세부 실행안보다 전체 그림과 방향성을 먼저 팀에 제시하려 한다.' },
+    { id:13, cat:'SN', pole:'S', text:'검증된 사례와 기존 프로세스를 기반으로 의사결정을 내리는 편이다.' },
+    { id:14, cat:'SN', pole:'N', text:'익숙한 운영 방식보다 새로운 접근을 시도해보고 싶어진다.' },
+    { id:15, cat:'SN', pole:'S', text:'보고를 받을 때도 정성적 평가보다 정량적 지표가 먼저 눈에 들어온다.' },
+
+    { id:16, cat:'TF', pole:'T', text:'팀 의사결정은 관계보다 논리와 기준을 우선해서 내린다.' },
+    { id:17, cat:'TF', pole:'F', text:'결정을 내릴 때 구성원 각자가 받을 영향을 먼저 헤아린다.' },
+    { id:18, cat:'TF', pole:'T', text:'성과가 부진한 팀원에게는 돌려 말하기보다 명확하게 지적하는 편이다.' },
+    { id:19, cat:'TF', pole:'F', text:'팀 분위기가 무너지면 성과보다 관계 회복을 먼저 챙긴다.' },
+    { id:20, cat:'TF', pole:'T', text:'인사평가는 기준과 성과에 따라 냉정하게 이뤄져야 한다고 본다.' },
+    { id:21, cat:'TF', pole:'F', text:'피드백을 줄 때 상대가 받아들이기 쉬운 방식을 먼저 고민한다.' },
+    { id:22, cat:'TF', pole:'T', text:'갈등이 생기면 관계보다 원칙을 지키는 것이 우선이라고 본다.' },
+    { id:23, cat:'TF', pole:'F', text:'결정을 내리기 전 관련된 구성원들의 입장을 먼저 듣는 편이다.' },
+
+    { id:24, cat:'JP', pole:'J', text:'팀의 일정과 역할은 미리 명확하게 정리해두어야 마음이 놓인다.' },
+    { id:25, cat:'JP', pole:'P', text:'상황이 바뀌면 계획도 유연하게 조정하는 편이 자연스럽다.' },
+    { id:26, cat:'JP', pole:'J', text:'중요한 마감은 여유 있게 끝내도록 팀을 미리 이끈다.' },
+    { id:27, cat:'JP', pole:'P', text:'마감이 임박해야 팀도 나도 오히려 몰입도가 올라간다.' },
+    { id:28, cat:'JP', pole:'J', text:'조직 운영은 정해진 절차와 체계를 따를 때 안정적이라고 느낀다.' },
+    { id:29, cat:'JP', pole:'P', text:'정해진 프로세스보다 상황에 맞는 더 나은 방법을 그때그때 찾는 게 좋다.' },
+    { id:30, cat:'JP', pole:'J', text:'해야 할 일을 목록화하고 하나씩 완료해가는 방식을 선호한다.' }
+  ];
+
+  var GROUP_META = {
+    NT:{ label:'전략설계형 (NT)', color:'var(--nt)' },
+    NF:{ label:'관계연결형 (NF)', color:'var(--nf)' },
+    SJ:{ label:'운영관리형 (SJ)', color:'var(--sj)' },
+    SP:{ label:'현장실행형 (SP)', color:'var(--sp)' }
+  };
+
+  var TYPE_INFO = {
+    ISTJ:{ emoji:'📋', alias:'체크리스트 없이는 못 잠드는 창고 소장', tagline:'원칙과 절차로 팀의 안정성을 지키는 리더',
+      desc:'정해진 기준과 절차를 지키며, 팀을 안정적으로 운영하는 리더입니다.',
+      daily:'하루 일과를 정해진 루틴대로 진행하며, 예외 상황에서도 원칙을 먼저 확인합니다.',
+      work:'절차와 체크리스트를 통해 팀의 실행 품질을 꾸준히 관리합니다.',
+      relationship:'말보다 행동으로 신뢰를 쌓고, 약속한 것은 반드시 지킵니다.',
+      tip:'예외 상황에서는 원칙보다 상황 판단이 필요할 수 있다는 점을 열어두면 좋습니다.' },
+    ISFJ:{ emoji:'🛡️', alias:'말없이 다 챙기는 그림자 서포터', tagline:'구성원 하나하나를 세심하게 챙기는 리더',
+      desc:'구성원 한 명 한 명을 세심하게 챙기며 묵묵히 지원하는 리더입니다.',
+      daily:'구성원들의 컨디션과 업무 부담을 세심하게 살피며 하루를 시작합니다.',
+      work:'팀원 각자에게 맞는 방식으로 지원하며, 궂은일도 묵묵히 함께 처리합니다.',
+      relationship:'신뢰를 바탕으로 한 안정적인 관계를 선호하며, 갈등보다 화합을 먼저 찾습니다.',
+      tip:'자신의 헌신을 드러내는 데 소극적일 수 있으니, 성과를 명확히 알리는 연습이 도움이 됩니다.' },
+    INFJ:{ emoji:'🔭', alias:'회의 중 갑자기 정곡을 찌르는 로드맵 예언자', tagline:'팀이 나아갈 의미와 방향을 그리는 리더',
+      desc:'팀이 나아갈 의미와 방향을 그리며, 구성원의 성장을 함께 고민하는 리더입니다.',
+      daily:'팀의 방향과 의미를 조용히 고민하며, 대화 속에서 핵심을 짚어냅니다.',
+      work:'단기 성과보다 팀이 나아갈 방향과 의미에 무게를 둡니다.',
+      relationship:'깊고 신뢰 있는 관계를 선호하며, 구성원의 성장에 진심으로 관심을 갖습니다.',
+      tip:'완벽한 방향을 찾느라 실행이 늦어질 수 있으니, 작은 시도로 먼저 검증해보는 것이 도움이 됩니다.' },
+    INTJ:{ emoji:'♟️', alias:'3년 뒤 구조까지 미리 그려둔 설계자', tagline:'장기적인 구조와 전략을 설계하는 리더',
+      desc:'장기적인 그림을 먼저 그리고, 효율적인 구조와 시스템을 설계하는 리더입니다.',
+      daily:'눈앞의 일보다 몇 단계 앞의 그림을 먼저 그려봅니다.',
+      work:'장기 전략과 효율적인 구조 설계에 강점을 보입니다.',
+      relationship:'감정적 교류보다 논리적 신뢰를 우선하며, 실력으로 인정받는 관계를 선호합니다.',
+      tip:'계획에 몰입하다 구성원과의 소통이 줄어들 수 있으니, 의식적인 공유가 필요합니다.' },
+    ISTP:{ emoji:'🔧', alias:'말보다 손이 먼저 나가는 현장 해결사', tagline:'현장에서 직접 부딪히며 해결하는 리더',
+      desc:'문제가 생기면 직접 부딪히며 실용적인 해결책을 찾아내는 리더입니다.',
+      daily:'문제가 생기면 말보다 손이 먼저 움직이며 직접 확인합니다.',
+      work:'현장 문제 해결과 실질적인 대안 마련에 강합니다.',
+      relationship:'필요할 때 곁에 있어주는 방식으로 신뢰를 표현합니다.',
+      tip:'장기 방향성 공유에는 소홀하기 쉬우니, 팀에 맥락을 설명하는 시간을 의식적으로 가지면 좋습니다.' },
+    ISFP:{ emoji:'🌿', alias:'무리한 야근보다 팀의 리듬을 지키는 균형자', tagline:'팀의 속도와 조화를 존중하는 리더',
+      desc:'팀의 속도와 분위기를 존중하며, 조용히 신뢰를 쌓아가는 리더입니다.',
+      daily:'팀의 분위기와 속도를 존중하며 무리하게 밀어붙이지 않습니다.',
+      work:'구성원 각자의 리듬을 인정하며 유연하게 업무를 조율합니다.',
+      relationship:'조용히 신뢰를 쌓아가며, 갈등 상황에서도 온화하게 접근합니다.',
+      tip:'필요한 순간에는 분명한 의사 표현이 팀에 방향성을 줄 수 있습니다.' },
+    INFP:{ emoji:'🧭', alias:'숫자보다 의미를 먼저 묻는 진심파', tagline:'가치와 신념을 바탕으로 이끄는 리더',
+      desc:'스스로와 팀의 가치관에 맞는 방향일 때 가장 강하게 몰입하는 리더입니다.',
+      daily:'스스로와 팀의 가치관이 일치하는 일에 자연스럽게 몰입합니다.',
+      work:'의미 있는 목표일 때 팀을 진심으로 설득하고 이끕니다.',
+      relationship:'진정성 있는 관계를 중요하게 여기며, 형식적인 소통은 어색해합니다.',
+      tip:'가치와 맞지 않는 일에도 실용적으로 접근하는 균형이 필요합니다.' },
+    INTP:{ emoji:'🔬', alias:'왜 되는지 끝까지 파고드는 원리주의자', tagline:'원리와 구조를 파고드는 탐구형 리더',
+      desc:'새로운 개념과 구조를 분석하며 원리를 파고드는 탐구형 리더입니다.',
+      daily:'새로운 개념이나 구조를 이해하는 데 자연스럽게 시간을 씁니다.',
+      work:'문제의 원리를 파고들어 근본적인 해결책을 찾습니다.',
+      relationship:'논리적인 대화를 선호하며, 관계보다 아이디어 교류에 집중합니다.',
+      tip:'분석에 머무르지 않고 팀에 결론과 다음 행동을 명확히 전달하는 것이 중요합니다.' },
+    ESTP:{ emoji:'⚡', alias:'장애 알림 뜨자마자 몸이 먼저 움직이는 해결사', tagline:'빠른 판단으로 돌파구를 만드는 리더',
+      desc:'상황 판단이 빠르고, 현장에서 부딪히며 답을 찾아가는 실행형 리더입니다.',
+      daily:'상황을 빠르게 파악하고 즉각적으로 움직입니다.',
+      work:'예상치 못한 문제 앞에서도 임기응변으로 돌파구를 만듭니다.',
+      relationship:'현장에서 함께 부딪히며 신뢰를 쌓는 것을 선호합니다.',
+      tip:'속도를 늦추고 장기적인 계획도 함께 챙기면 팀의 안정성이 높아집니다.' },
+    ESFP:{ emoji:'🎤', alias:'출근하자마자 텐션부터 올리는 분위기 메이커', tagline:'현장의 활력을 이끄는 리더',
+      desc:'팀 분위기를 밝게 만들고, 구성원과 함께 움직이며 이끄는 리더입니다.',
+      daily:'팀의 에너지를 살피고 분위기를 밝게 만드는 것을 자연스럽게 합니다.',
+      work:'현장에서 구성원과 함께 움직이며 실행력을 이끌어냅니다.',
+      relationship:'친근하고 즉각적인 소통으로 관계를 넓혀갑니다.',
+      tip:'즐거운 분위기만큼 장기 계획도 함께 챙기면 균형 잡힌 리더십이 됩니다.' },
+    ENFP:{ emoji:'✨', alias:'아이디어 회의 때 눈이 제일 반짝이는 사람', tagline:'새로운 아이디어로 팀에 영감을 주는 리더',
+      desc:'새로운 아이디어에 열정적으로 반응하며, 구성원과의 연결을 소중히 여기는 리더입니다.',
+      daily:'새로운 아이디어가 떠오르면 주변에 열정적으로 공유합니다.',
+      work:'팀에 동기와 영감을 불어넣으며 새로운 시도를 이끕니다.',
+      relationship:'사람과의 연결을 소중히 여기며 폭넓은 관계를 만들어갑니다.',
+      tip:'여러 아이디어 중 우선순위를 정해 팀이 흔들리지 않도록 돕는 것이 중요합니다.' },
+    ENTP:{ emoji:'💡', alias:'왜 지금까지 이렇게 했냐고 묻는 반란군 수장', tagline:'질문을 던지며 변화를 주도하는 리더',
+      desc:'기존 방식에 질문을 던지고, 새로운 시도를 주도하는 리더입니다.',
+      daily:'기존 방식에 자연스럽게 질문을 던지며 다른 가능성을 찾습니다.',
+      work:'새로운 접근과 실험적인 시도를 주도합니다.',
+      relationship:'활발한 토론을 즐기며 아이디어로 서로를 자극하는 관계를 선호합니다.',
+      tip:'새로운 시도만큼 기존 것을 마무리하는 힘도 함께 기르면 좋습니다.' },
+    ESTJ:{ emoji:'⚙️', alias:'간트차트 없이는 못 사는 일정관리 장인', tagline:'목표와 일정을 체계적으로 이끄는 리더',
+      desc:'목표와 일정을 명확히 하고, 조직을 체계적으로 이끄는 리더입니다.',
+      daily:'하루의 우선순위와 일정을 명확히 정리하며 시작합니다.',
+      work:'목표와 기준을 분명히 하고 조직을 체계적으로 운영합니다.',
+      relationship:'신뢰는 명확한 역할과 성과를 통해 쌓인다고 생각합니다.',
+      tip:'효율만큼 구성원의 감정적 신호에도 귀 기울이면 좋습니다.' },
+    ESFJ:{ emoji:'🤝', alias:'싸우기 전에 먼저 화해시키는 중재자', tagline:'조화로운 팀 분위기를 만드는 리더',
+      desc:'구성원을 세심하게 챙기며 조화로운 팀 분위기를 만드는 리더입니다.',
+      daily:'팀의 분위기와 구성원 간 관계를 자연스럽게 살핍니다.',
+      work:'협업과 조율을 통해 팀이 매끄럽게 움직이도록 만듭니다.',
+      relationship:'세심한 배려로 신뢰를 쌓으며 조화를 우선시합니다.',
+      tip:'관계를 지키려다 필요한 지적을 미루지 않는 균형이 필요합니다.' },
+    ENFJ:{ emoji:'🌟', alias:'1:1 미팅에서 사람을 키우는 코치', tagline:'구성원의 성장을 이끌어내는 리더',
+      desc:'구성원 각자의 강점을 이끌어내며, 함께 성장하는 방향을 제시하는 리더입니다.',
+      daily:'구성원 각자의 강점과 상태를 자연스럽게 살핍니다.',
+      work:'팀원의 성장 방향을 함께 고민하며 동기를 이끌어냅니다.',
+      relationship:'진심 어린 관심으로 깊은 신뢰 관계를 만듭니다.',
+      tip:'모두를 만족시키려다 정작 중요한 결정을 미루지 않도록 주의가 필요합니다.' },
+    ENTJ:{ emoji:'🚀', alias:'회의 끝나기 전에 액션 아이템부터 정리하는 추진력 갑', tagline:'결단력으로 팀을 목표에 정렬시키는 리더',
+      desc:'목표를 향해 팀을 빠르게 정렬시키고, 결단력 있게 밀어붙이는 리더입니다.',
+      daily:'목표를 먼저 설정하고 그에 맞춰 하루를 구조화합니다.',
+      work:'팀을 목표에 빠르게 정렬시키고 결단력 있게 추진합니다.',
+      relationship:'능력과 성과를 통한 신뢰를 중요하게 생각합니다.',
+      tip:'속도를 늦추고 구성원의 의견을 충분히 듣는 시간도 필요합니다.' }
+  };
+
+  function groupOf(code){
+    return code[1]==='N' ? (code[2]==='T'?'NT':'NF') : (code[3]==='J'?'SJ':'SP');
+  }
+
+  /* ============ storage helpers (shared team data) ============ */
+  function memberKey(name){ return 'member:' + name; }
+
+  async function getMember(name){
+    try{
+      if(backendMode==='claude'){
+        var res = await window.storage.get(memberKey(name), true);
+        return res ? JSON.parse(res.value) : null;
+      }
+      if(backendMode==='http'){
+        var list = await listMembers();
+        var found = list.find(function(m){ return m.nickname===name; });
+        return found || null;
+      }
+      return memoryStore[name] || null;
+    }catch(e){ return null; }
+  }
+
+  async function setMember(name, data){
+    try{
+      if(backendMode==='claude'){
+        var res = await window.storage.set(memberKey(name), JSON.stringify(data), true);
+        return !!res;
+      }
+      if(backendMode==='http'){
+        var r = await fetch(apiUrl('/api/members'), {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(data)
+        });
+        return r.ok;
+      }
+      memoryStore[name] = data;
+      return true;
+    }catch(e){ console.error(e); return false; }
+  }
+
+  async function deleteMember(name){
+    try{
+      if(backendMode==='claude'){
+        await window.storage.delete(memberKey(name), true);
+        return true;
+      }
+      if(backendMode==='http'){
+        var r = await fetch(apiUrl('/api/members?nickname=' + encodeURIComponent(name)), { method:'DELETE' });
+        return r.ok;
+      }
+      delete memoryStore[name];
+      return true;
+    }catch(e){ console.error(e); return false; }
+  }
+
+  async function listMembers(){
+    try{
+      if(backendMode==='claude'){
+        var res = await window.storage.list('member:', true);
+        if(!res || !res.keys) return [];
+        var out = [];
+        for(var i=0;i<res.keys.length;i++){
+          try{
+            var item = await window.storage.get(res.keys[i], true);
+            if(item) out.push(JSON.parse(item.value));
+          }catch(e){}
+        }
+        return out;
+      }
+      if(backendMode==='http'){
+        var r = await fetch(apiUrl('/api/members'), { method:'GET' });
+        if(!r.ok) return [];
+        return await r.json();
+      }
+      return Object.keys(memoryStore).map(function(k){ return memoryStore[k]; });
+    }catch(e){ return []; }
+  }
+
+  /* ============ utils ============ */
+  function $(sel){ return document.querySelector(sel); }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(s){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s];
+    });
+  }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function formatDate(iso){
+    var d = new Date(iso);
+    return d.getFullYear() + '.' + pad2(d.getMonth()+1) + '.' + pad2(d.getDate());
+  }
+  var toastTimer = null;
+  function toast(msg){
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  }
+
+  /* ============ scoring ============ */
+  function computeResult(answers){
+    var letters = {}, pct = {};
+    CATEGORIES.forEach(function(cat){
+      var qs = QUESTIONS.filter(function(q){ return q.cat===cat.key; });
+      var sumLeft = 0;
+      qs.forEach(function(q){
+        var v = answers[q.id];
+        sumLeft += (q.pole===cat.left) ? v : (6-v);
+      });
+      var avg = sumLeft / qs.length;
+      var leftPct = Math.round(((avg-1)/4)*100);
+      leftPct = Math.max(0, Math.min(100, leftPct));
+      var letter = avg>=3 ? cat.left : cat.right;
+      letters[cat.key] = letter;
+      pct[cat.key] = { left:cat.left, right:cat.right, leftPct:leftPct, rightPct:100-leftPct };
+    });
+    var code = CATEGORIES.map(function(c){ return letters[c.key]; }).join('');
+    return { code:code, pct:pct };
+  }
+
+  function gaugeHtml(label, pctObj){
+    return '' +
+      '<div class="gauge">' +
+        '<div class="gauge-label">' + label + '</div>' +
+        '<div class="gauge-bar"><div class="gauge-fill" style="width:' + pctObj.leftPct + '%"></div></div>' +
+        '<div class="gauge-ends"><span>' + pctObj.left + ' ' + pctObj.leftPct + '%</span><span>' + pctObj.right + ' ' + pctObj.rightPct + '%</span></div>' +
+      '</div>';
+  }
+
+  /* ============ router ============ */
+  function parseHash(){
+    var h = location.hash.replace(/^#\/?/, '');
+    var parts = h.split('?');
+    var path = parts[0] || 'home';
+    var params = new URLSearchParams(parts[1] || '');
+    return { path:path, params:params };
+  }
+  function go(path, query){
+    var qs = query ? '?' + new URLSearchParams(query).toString() : '';
+    location.hash = '#/' + path + qs;
+  }
+  function updateTabs(path){
+    document.querySelectorAll('.tab').forEach(function(t){
+      t.classList.toggle('active', t.dataset.path===path);
+    });
+  }
+
+  async function route(){
+    clearAutoAdvance();
+    var parsed = parseHash();
+    updateTabs(parsed.path);
+    if(parsed.path==='test') renderTestStep(parsed.params.get('name') || '');
+    else if(parsed.path==='detail') await renderDetail(parsed.params.get('name') || '');
+    else if(parsed.path==='style') renderStyleDetail(parsed.params.get('code') || '');
+    else if(parsed.path==='dashboard') await renderDashboard();
+    else if(parsed.path==='admin') renderAdmin();
+    else renderHome();
+  }
+
+  /* ============ home ============ */
+  function renderHome(){
+    $('#app').innerHTML =
+      '<section class="grid2">' +
+        '<div class="hero-copy">' +
+          '<span class="eyebrow">TEAM MBTI · LEADERSHIP</span>' +
+          '<h1>유통/서비스IT팀 리더 MBTI 진단</h1>' +
+          '<p>팀 내 리더들을 대상으로 한 30문항 진단으로, 어떤 스타일로 팀을 이끄는지 확인하고 리더십 성향 분포를 한 화면에서 살펴보세요.</p>' +
+          '<p class="note">결과는 팀 공유 저장소에 기록됩니다. 같은 닉네임으로 다시 제출하면 최신 결과로 갱신돼요.</p>' +
+        '</div>' +
+        '<div class="ticket">' +
+          '<span class="mono-label">NICKNAME</span>' +
+          '<input id="nickname-input" type="text" maxlength="20" placeholder="닉네임을 입력하세요" autocomplete="off" />' +
+          '<button class="btn-primary" data-action="start-test">진단 시작 (30문항)</button>' +
+        '</div>' +
+      '</section>' +
+      '<section class="card followup">' +
+        '<h2>이미 진단한 리더가 있다면</h2>' +
+        '<p>리더 목록, 16유형 분포, E/I·S/N·T/F·J/P 리더십 성향을 바로 확인할 수 있습니다.</p>' +
+        '<button class="btn-outline" data-action="goto-dashboard">대시보드 바로가기 →</button>' +
+      '</section>';
+  }
+
+  /* ============ test wizard (one question per step) ============ */
+  var testState = { name:'', index:0, answers:{} };
+
+  function renderTestStep(name){
+    if(!name){ go('home'); return; }
+    if(testState.name !== name){ testState = { name:name, index:0, answers:{} }; }
+
+    var total = QUESTIONS.length;
+    var idx = Math.max(0, Math.min(testState.index, total-1));
+    testState.index = idx;
+    var question = QUESTIONS[idx];
+    var catIndex = CATEGORIES.findIndex(function(c){ return c.key===question.cat; });
+    var category = CATEGORIES[catIndex];
+    var answeredValue = testState.answers[question.id];
+    var isLast = idx === total-1;
+
+    var overallPct = Math.round((idx/total)*100);
+
+    var segmentsHtml = CATEGORIES.map(function(c){
+      var qs = QUESTIONS.filter(function(q){ return q.cat===c.key; });
+      var done = qs.filter(function(q){ return testState.answers.hasOwnProperty(q.id); }).length;
+      var pct = Math.round((done/qs.length)*100);
+      return '<div class="segment' + (c.key===category.key?' current':'') + '"><div class="segment-fill" style="width:' + pct + '%"></div></div>';
+    }).join('');
+
+    var likertHtml = LIKERT_LABELS.map(function(lab, i){
+      var val = i+1;
+      var sel = answeredValue===val ? ' selected' : '';
+      return '<button type="button" class="likert-vbtn' + sel + '" data-value="' + val + '">' + lab + '</button>';
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="test-step">' +
+        '<div class="test-head"><h1>' + escapeHtml(name) + '님의 리더십 진단</h1></div>' +
+        '<div class="overall-bar"><div class="overall-fill" style="width:' + overallPct + '%"></div></div>' +
+        '<div class="segments">' + segmentsHtml + '</div>' +
+        '<div class="progress-meta">' +
+          '<span class="mono-label">STATION ' + (catIndex+1) + ' · ' + category.label + '</span>' +
+          '<span class="mono-label">질문 ' + (idx+1) + ' / ' + total + '</span>' +
+        '</div>' +
+        '<div class="wizard-question">' +
+          '<p class="q-text-big">' + escapeHtml(question.text) + '</p>' +
+          '<div class="likert-vertical" data-qid="' + question.id + '">' + likertHtml + '</div>' +
+        '</div>' +
+        '<div class="wizard-nav">' +
+          '<button class="btn-outline" data-action="prev-question"' + (idx===0?' disabled':'') + '>이전</button>' +
+          '<button class="btn-primary" data-action="next-question"' + (answeredValue===undefined?' disabled':'') + '>' + (isLast?'결과 보기':'다음') + '</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  async function goNextStep(){
+    var total = QUESTIONS.length;
+    var question = QUESTIONS[testState.index];
+    if(testState.answers[question.id]===undefined){
+      toast('답변을 선택해주세요.');
+      return;
+    }
+    if(testState.index >= total-1){
+      await submitTest();
+      return;
+    }
+    testState.index += 1;
+    renderTestStep(testState.name);
+  }
+  function goPrevStep(){
+    if(testState.index > 0){
+      testState.index -= 1;
+      renderTestStep(testState.name);
+    }
+  }
+
+  async function submitTest(){
+    var total = QUESTIONS.length;
+    var answeredCount = Object.keys(testState.answers).length;
+    if(answeredCount < total){
+      toast('모든 문항에 답변해주세요. (' + answeredCount + '/' + total + ')');
+      return;
+    }
+    var btn = document.querySelector('[data-action="next-question"]');
+    if(btn){ btn.disabled = true; btn.textContent = '저장 중...'; }
+
+    var result = computeResult(testState.answers);
+    var info = TYPE_INFO[result.code];
+    var data = {
+      nickname: testState.name,
+      mbti: result.code,
+      alias: info.alias,
+      group: groupOf(result.code),
+      pct: result.pct,
+      date: new Date().toISOString()
+    };
+    var ok = await setMember(testState.name, data);
+    if(ok){
+      var savedName = testState.name;
+      testState = { name:'', index:0, answers:{} };
+      go('detail', { name: savedName });
+    }else{
+      toast('저장에 실패했어요. 다시 시도해주세요.');
+      if(btn){ btn.disabled = false; btn.textContent = '결과 보기'; }
+    }
+  }
+
+  /* ============ detail / result ============ */
+  async function renderDetail(name){
+    if(!name){ go('dashboard'); return; }
+    $('#app').innerHTML = '<p class="loading">불러오는 중...</p>';
+    var data = await getMember(name);
+    if(!data){
+      $('#app').innerHTML =
+        '<section class="card">' +
+          '<p>“' + escapeHtml(name) + '”님의 결과를 찾을 수 없습니다.</p>' +
+          '<div class="actions"><button class="btn-outline" data-action="goto-dashboard">대시보드로</button></div>' +
+        '</section>';
+      return;
+    }
+    var group = GROUP_META[data.group];
+    var gaugesHtml = CATEGORIES.map(function(c){ return gaugeHtml(c.label, data.pct[c.key]); }).join('');
+
+    $('#app').innerHTML =
+      '<section class="ticket result-ticket" style="--group-color:' + group.color + '">' +
+        '<div class="ticket-top"><span class="mono-label">LEADERSHIP RESULT</span><span class="barcode-mini"></span></div>' +
+        '<p class="style-question">' + escapeHtml(data.nickname) + '님은 어떤 스타일의 리더일까요?</p>' +
+        '<a href="#/style?code=' + data.mbti + '" class="style-hero-link"><div class="style-hero">' + data.alias + '</div></a>' +
+        '<div class="result-chips">' +
+          '<a href="#/style?code=' + data.mbti + '" class="code-chip">' + data.mbti + '</a>' +
+          '<span class="group-chip">' + group.label + '</span>' +
+        '</div>' +
+        '<p class="nickname-line">' + escapeHtml(data.nickname) + '</p>' +
+        '<p class="desc">' + TYPE_INFO[data.mbti].desc + '</p>' +
+        '<div class="gauges">' + gaugesHtml + '</div>' +
+        '<div class="ticket-foot"><span class="mono-label">검사일 ' + formatDate(data.date) + '</span></div>' +
+      '</section>' +
+      '<div class="actions">' +
+        '<button class="btn-outline" data-action="retest" data-name="' + escapeHtml(data.nickname) + '">진단 다시 하기</button>' +
+        '<button class="btn-outline" data-action="goto-dashboard">대시보드로</button>' +
+      '</div>';
+  }
+
+  /* ============ MBTI type detail (설명 페이지) ============ */
+  function renderStyleDetail(code){
+    var info = TYPE_INFO[code];
+    if(!info){
+      $('#app').innerHTML =
+        '<section class="card">' +
+          '<p>존재하지 않는 유형입니다.</p>' +
+          '<div class="actions"><button class="btn-outline" data-action="goto-dashboard">대시보드로</button></div>' +
+        '</section>';
+      return;
+    }
+    var group = GROUP_META[groupOf(code)];
+    $('#app').innerHTML =
+      '<section class="ticket style-detail" style="--group-color:' + group.color + '">' +
+        '<div class="ticket-top"><span class="type-emoji">' + info.emoji + '</span><span class="mono-label">LEADERSHIP TYPE</span></div>' +
+        '<h1 class="style-code-big">' + code + '</h1>' +
+        '<p class="style-tagline">' + info.tagline + '</p>' +
+        '<div class="result-chips"><span class="group-chip">' + group.label + '</span></div>' +
+        '<h2 class="style-alias-heading">' + info.alias + '</h2>' +
+        '<p class="desc">' + info.desc + '</p>' +
+        '<div class="style-sections">' +
+          '<h3>실전에서는 이렇게 보일 수 있어요</h3>' +
+          '<div class="style-block"><span class="style-block-label">일상</span><p>' + info.daily + '</p></div>' +
+          '<div class="style-block"><span class="style-block-label">팀 운영</span><p>' + info.work + '</p></div>' +
+          '<div class="style-block"><span class="style-block-label">구성원과의 관계</span><p>' + info.relationship + '</p></div>' +
+          '<div class="style-block"><span class="style-block-label">활용 팁</span><p>' + info.tip + '</p></div>' +
+        '</div>' +
+      '</section>' +
+      '<div class="actions">' +
+        '<button class="btn-outline" data-action="goto-dashboard">대시보드로 돌아가기</button>' +
+        '<button class="btn-outline" data-action="goto-home">진단 시작하기</button>' +
+      '</div>';
+  }
+
+  /* ============ dashboard ============ */
+  async function renderDashboard(){
+    $('#app').innerHTML = '<p class="loading">불러오는 중...</p>';
+    var members = await listMembers();
+    members.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+    var total = members.length;
+
+    // 구성원 유형 분포 (16 types)
+    var typeCounts = {};
+    Object.keys(TYPE_INFO).forEach(function(t){ typeCounts[t] = 0; });
+    members.forEach(function(m){ typeCounts[m.mbti] = (typeCounts[m.mbti]||0) + 1; });
+    var maxCount = 1;
+    Object.keys(typeCounts).forEach(function(t){ if(typeCounts[t] > maxCount) maxCount = typeCounts[t]; });
+    var typeBarsHtml = Object.keys(TYPE_INFO).map(function(t){
+      var color = GROUP_META[groupOf(t)].color;
+      var width = (typeCounts[t]/maxCount*100);
+      return '<div class="type-bar-row">' +
+        '<span class="type-code" style="color:' + color + '">' + t + '</span>' +
+        '<div class="type-bar-track"><div class="type-bar-fill" style="width:' + width + '%; background:' + color + '"></div></div>' +
+        '<span class="type-count">' + typeCounts[t] + '</span>' +
+      '</div>';
+    }).join('');
+
+    // 지표별 누적 점수 (E/I·S/N·T/F·J/P 각각의 팀 전체 합산 점수)
+    var scoreGaugesHtml = CATEGORIES.map(function(c){
+      var leftSum = 0, rightSum = 0;
+      members.forEach(function(m){
+        leftSum += m.pct[c.key].leftPct;
+        rightSum += m.pct[c.key].rightPct;
+      });
+      var sumTotal = leftSum + rightSum;
+      var leftBarPct = sumTotal>0 ? Math.round((leftSum/sumTotal)*100) : 50;
+      return '<div class="gauge">' +
+        '<div class="gauge-label">' + c.label + '</div>' +
+        '<div class="gauge-bar"><div class="gauge-fill" style="width:' + leftBarPct + '%"></div></div>' +
+        '<div class="gauge-ends"><span>' + c.left + ' ' + leftSum + '점</span><span>' + c.right + ' ' + rightSum + '점</span></div>' +
+      '</div>';
+    }).join('');
+
+    var rowsHtml = total===0
+      ? '<tr><td colspan="4" class="empty">아직 저장된 결과가 없습니다.</td></tr>'
+      : members.map(function(m){
+          var personHref = '#/detail?name=' + encodeURIComponent(m.nickname);
+          var styleHref = '#/style?code=' + m.mbti;
+          return '<tr>' +
+            '<td><a href="' + personHref + '" class="row-link">' + escapeHtml(m.nickname) + '</a></td>' +
+            '<td><span class="badge" style="--badge-color:' + GROUP_META[m.group].color + '">' + m.mbti + '</span></td>' +
+            '<td><a href="' + styleHref + '" class="row-link">' + m.alias + '</a></td>' +
+            '<td class="mono-cell">' + formatDate(m.date) + '</td>' +
+          '</tr>';
+        }).join('');
+
+    $('#app').innerHTML =
+      '<section class="dash-head">' +
+        '<h1>유통/서비스IT팀 리더 MBTI 대시보드</h1>' +
+        '<div class="dash-stat"><span class="mono-label">공유 저장소 기준 · 총 ' + total + '명</span>' +
+        '<button class="btn-outline small" data-action="refresh-dashboard">새로고침</button></div>' +
+      '</section>' +
+      '<section class="card">' +
+        '<h2>구성원 결과</h2>' +
+        '<p class="hint">닉네임을 누르면 그 사람의 결과로, 별명을 누르면 유형 설명으로 이동합니다.</p>' +
+        '<table class="member-table">' +
+          '<thead><tr><th>닉네임</th><th>MBTI</th><th>별명</th><th>검사일</th></tr></thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>' +
+      '</section>' +
+      '<section class="card">' +
+        '<h2>우리 팀 MBTI 분포</h2>' +
+        '<p class="hint">구성원 유형 분포와 지표별 누적 점수예요.</p>' +
+        '<div class="type-bars">' + typeBarsHtml + '</div>' +
+        '<div class="gauges" style="margin-top:20px;">' + scoreGaugesHtml + '</div>' +
+      '</section>';
+  }
+
+  /* ============ admin (password-gated) ============ */
+  var adminUnlocked = false;
+
+  function renderAdmin(){
+    if(!adminUnlocked){
+      $('#app').innerHTML =
+        '<section class="card admin-gate">' +
+          '<h1>관리자 로그인</h1>' +
+          '<p class="note">관리자 비밀번호를 입력하세요.</p>' +
+          '<input id="admin-password" type="password" placeholder="비밀번호" autocomplete="off" />' +
+          '<button class="btn-primary" data-action="admin-login">확인</button>' +
+        '</section>';
+      var input = $('#admin-password');
+      if(input) input.focus();
+      return;
+    }
+    renderAdminPanel();
+  }
+
+  async function renderAdminPanel(){
+    $('#app').innerHTML = '<p class="loading">불러오는 중...</p>';
+    var members = await listMembers();
+    members.sort(function(a,b){ return a.nickname.localeCompare(b.nickname); });
+
+    var rowsHtml = members.length===0
+      ? '<tr><td colspan="5" class="empty">아직 저장된 결과가 없습니다.</td></tr>'
+      : members.map(function(m){
+          return '<tr>' +
+            '<td>' + escapeHtml(m.nickname) + '</td>' +
+            '<td><span class="badge" style="--badge-color:' + GROUP_META[m.group].color + '">' + m.mbti + '</span></td>' +
+            '<td>' + m.alias + '</td>' +
+            '<td class="mono-cell">' + formatDate(m.date) + '</td>' +
+            '<td><button class="btn-danger" data-action="delete-member" data-name="' + escapeHtml(m.nickname) + '">삭제</button></td>' +
+          '</tr>';
+        }).join('');
+
+    $('#app').innerHTML =
+      '<section class="dash-head">' +
+        '<h1>관리자</h1>' +
+        '<p class="note warn">이 페이지에서는 팀 공유 저장소의 결과를 삭제할 수 있습니다. 삭제한 데이터는 복구할 수 없습니다.</p>' +
+      '</section>' +
+      '<section class="card">' +
+        '<div class="admin-toolbar">' +
+          '<span class="mono-label">총 ' + members.length + '명</span>' +
+          '<button class="btn-danger" data-action="reset-all"' + (members.length===0?' disabled':'') + '>전체 삭제</button>' +
+        '</div>' +
+        '<table class="member-table">' +
+          '<thead><tr><th>닉네임</th><th>MBTI</th><th>별명</th><th>검사일</th><th></th></tr></thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>' +
+      '</section>';
+  }
+
+  async function handleResetAll(){
+    if(!confirm('정말 전체 결과를 삭제할까요? 되돌릴 수 없습니다.')) return;
+    var members = await listMembers();
+    for(var i=0;i<members.length;i++){ await deleteMember(members[i].nickname); }
+    toast('전체 삭제되었습니다.');
+    renderAdminPanel();
+  }
+  async function handleDeleteMember(name){
+    if(!confirm("'" + name + "' 님의 결과를 삭제할까요?")) return;
+    await deleteMember(name);
+    toast('삭제되었습니다.');
+    renderAdminPanel();
+  }
+  function handleAdminLogin(){
+    var input = $('#admin-password');
+    var val = input ? input.value : '';
+    if(val === ADMIN_PASSWORD){
+      adminUnlocked = true;
+      renderAdminPanel();
+    }else{
+      toast('비밀번호가 올바르지 않습니다.');
+    }
+  }
+
+  /* ============ global delegated events ============ */
+  var appEl = document.getElementById('app');
+  var autoAdvanceTimer = null;
+  function clearAutoAdvance(){
+    if(autoAdvanceTimer){ clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+  }
+
+  appEl.addEventListener('click', async function(e){
+    var likertBtn = e.target.closest('.likert-vbtn');
+    if(likertBtn){
+      var likertDiv = likertBtn.closest('.likert-vertical');
+      var qid = Number(likertDiv.dataset.qid);
+      var value = Number(likertBtn.dataset.value);
+      testState.answers[qid] = value;
+
+      // Update just the selection highlight + enable the next/submit button
+      // directly (no full re-render here) so clicking an option never causes
+      // a layout jump.
+      likertDiv.querySelectorAll('.likert-vbtn').forEach(function(b){
+        b.classList.toggle('selected', b===likertBtn);
+      });
+      var nextBtnNow = document.querySelector('[data-action="next-question"]');
+      if(nextBtnNow) nextBtnNow.disabled = false;
+
+      // Auto-advance to the next question (or submit, on the last one) —
+      // same action as clicking "다음"/"결과 보기". A brief pause lets the
+      // person see their selection highlighted before the step changes.
+      clearAutoAdvance();
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var delay = reduceMotion ? 0 : 350;
+      autoAdvanceTimer = setTimeout(async function(){
+        autoAdvanceTimer = null;
+        await goNextStep();
+      }, delay);
+      return;
+    }
+
+    var actionEl = e.target.closest('[data-action]');
+    if(!actionEl) return;
+    var action = actionEl.dataset.action;
+
+    if(action==='start-test'){
+      var input = $('#nickname-input');
+      var name = input ? input.value.trim() : '';
+      if(!name){ toast('닉네임을 입력해주세요.'); if(input) input.focus(); return; }
+      go('test', { name:name });
+    } else if(action==='goto-dashboard'){
+      go('dashboard');
+    } else if(action==='goto-home'){
+      go('home');
+    } else if(action==='next-question'){
+      clearAutoAdvance();
+      await goNextStep();
+    } else if(action==='prev-question'){
+      clearAutoAdvance();
+      goPrevStep();
+    } else if(action==='retest'){
+      go('test', { name: actionEl.dataset.name });
+    } else if(action==='refresh-dashboard'){
+      renderDashboard();
+    } else if(action==='admin-login'){
+      handleAdminLogin();
+    } else if(action==='reset-all'){
+      await handleResetAll();
+    } else if(action==='delete-member'){
+      await handleDeleteMember(actionEl.dataset.name);
+    }
+  });
+
+  appEl.addEventListener('keydown', function(e){
+    if(e.key!=='Enter') return;
+    if(e.target && e.target.id==='nickname-input'){
+      var name = e.target.value.trim();
+      if(!name){ toast('닉네임을 입력해주세요.'); return; }
+      go('test', { name:name });
+    } else if(e.target && e.target.id==='admin-password'){
+      handleAdminLogin();
+    }
+  });
+
+  (async function init(){
+    backendMode = await detectBackend();
+    if(backendMode==='memory'){
+      var banner = document.getElementById('fallback-banner');
+      if(banner){
+        banner.style.display = 'block';
+        banner.textContent = '⚠ 공유 저장소에 연결되지 않아 이 브라우저 탭에서만 임시로 동작합니다. 팀원 간 결과 공유가 필요하면 Claude 아티팩트로 열거나, Neon과 연동된 배포본을 사용해주세요.';
+      }
+    }
+    window.addEventListener('hashchange', route);
+    route();
+  })();
+})();
+</script>
+</body>
+</html>
