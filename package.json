@@ -1,0 +1,12 @@
+{
+  "name": "leader-mbti-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "유통/서비스IT팀 리더 MBTI 대시보드 (Vercel + Neon)",
+  "scripts": {
+    "build": "echo 'static site — no build step needed'"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0"
+  }
+}
